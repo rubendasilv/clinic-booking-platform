@@ -1,0 +1,44 @@
+# --- Secrets ---
+# real environment files
+.env
+.env.*
+# keep the template
+!.env.example
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# --- Django ---
+# collected static files (built inside the container)
+staticfiles/
+# user uploads
+media/
+# local sqlite db if ever used
+db.sqlite3
+
+# --- Celery ---
+# beat's local schedule file
+celerybeat-schedule*
+celerybeat.pid
+
+# --- Testing & tooling ---
+.pytest_cache/
+.coverage
+htmlcov/
+.ruff_cache/
+.mypy_cache/
+
+# --- Database backups ---
+backups/
+*.sql
+*.dump
+
+# --- Editors & OS ---
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
