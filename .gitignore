@@ -37,6 +37,10 @@ backups/
 *.sql
 *.dump
 
+# --- Progress check ---
+# daily reports from daily-check.sh (local only)
+progress-reports/
+
 # --- Editors & OS ---
 .vscode/
 .idea/
