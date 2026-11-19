@@ -4,6 +4,7 @@ import os
 from pathlib import Path
 
 from celery.schedules import crontab
+from django.core.exceptions import ImproperlyConfigured
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -23,6 +24,12 @@ def env_list(name, default=""):
 # --- Core ---
 SECRET_KEY = env("DJANGO_SECRET_KEY", "dev-only-insecure-key")
 DEBUG = env_bool("DJANGO_DEBUG", False)
+# Refuse to run in production with a placeholder or weak secret key
+if not DEBUG and (SECRET_KEY in {"dev-only-insecure-key", "change-me"} or len(SECRET_KEY) < 40):
+    raise ImproperlyConfigured(
+        "DJANGO_SECRET_KEY must be set to a real secret of at least 40 characters "
+        "when DJANGO_DEBUG is False."
+    )
 ALLOWED_HOSTS = env_list("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1")
 CSRF_TRUSTED_ORIGINS = env_list("DJANGO_CSRF_TRUSTED_ORIGINS", "http://localhost:8000")
 SITE_URL = env("SITE_URL", "http://localhost:8000").rstrip("/")

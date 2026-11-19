@@ -22,7 +22,7 @@ jobs:
     env:
       POSTGRES_HOST: localhost
       POSTGRES_PASSWORD: booking
-      DJANGO_SECRET_KEY: ci-only
+      DJANGO_SECRET_KEY: ci-only-not-a-real-secret-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
