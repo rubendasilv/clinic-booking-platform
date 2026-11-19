@@ -1,0 +1,21 @@
+{% load booking_tags %}{% autoescape off %}
+Hi {{ customer.first_name }},
+
+Your booking at {{ business.name }} is confirmed.
+
+{{ start|date:"l j F" }} at {{ start|time:"H:i" }}
+{{ service.name }} ({{ service.duration_minutes }} min)
+{{ business.address }}
+{% if booking.deposit %}
+{% if booking.deposit_paid %}Your {{ booking.deposit|gbp }} deposit is paid and comes off the price on the day.{% else %}A {{ booking.deposit|gbp }} deposit is payable at your appointment.{% endif %}
+{% endif %}{% if service.requires_patch_test %}
+First treatment? You need a patch test at least 48 hours before. Reply to this email if you haven't had one.
+{% endif %}
+Before you come: avoid sun and fake tan on the area for 2 weeks, and shave (don't wax) the area the day before hair removal.
+
+Change or cancel: {{ manage_url }}
+Changes made less than {{ rules.cancellation_window_hours }} hours before your appointment lose the deposit.
+
+{{ business.name }}
+{{ business.phone }}
+{% endautoescape %}

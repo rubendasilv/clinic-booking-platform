@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% load booking_tags %}
+{% block title %}Booking {{ booking.get_status_display|lower }} | {{ business.name }}{% endblock %}
+{% block content %}
+<section class="section">
+  <div class="wrap">
+    {% if booking.status == "confirmed" %}
+      <h1>You're booked in, {{ booking.customer.first_name }}.</h1>
+      <p class="lede">We've emailed a confirmation and calendar invite to {{ booking.customer.email }}.</p>
+    {% elif booking.status == "pending_payment" %}
+      <h1>Pay your deposit to confirm.</h1>
+      <p class="lede">We're holding this time for {{ rules.unpaid_hold_minutes }} minutes. If you've just paid, refresh this page in a moment.</p>
+    {% else %}
+      <h1>This booking is {{ booking.get_status_display|lower }}.</h1>
+    {% endif %}
+
+    <div class="ticket">
+      <p class="when">{{ start|date:"l j F" }} at {{ start|time:"H:i" }}</p>
+      <p>{{ booking.service.name }}, {{ booking.service.duration_minutes|minutes }}<br>{{ business.address }}</p>
+      <p><span class="status status-{{ booking.status }}">{{ booking.get_status_display }}</span></p>
+      {% if booking.deposit %}
+        <p class="small muted">{% if booking.deposit_paid %}Deposit of {{ booking.deposit|gbp }} paid.{% else %}Deposit of {{ booking.deposit|gbp }} payable at your appointment.{% endif %}</p>
+      {% endif %}
+    </div>
+
+    {% if booking.status == "pending_payment" %}
+    <form method="post" action="{% url 'bookings:manage' token %}">
+      {% csrf_token %}<input type="hidden" name="action" value="pay">
+      <button class="btn" type="submit">Pay {{ booking.deposit|gbp }} deposit</button>
+    </form>
+    {% endif %}
+
+    {% if booking.service.requires_patch_test %}
+    <div class="notice notice-warn"><p>If this is your first treatment, you need a patch test at least 48 hours before. Reply to your confirmation email if you haven't had one.</p></div>
+    {% endif %}
+
+    <div class="btn-row">
+      <a class="btn btn-quiet" href="{% url 'bookings:manage' token %}">Change or cancel</a>
+      <a href="{% url 'bookings:home' %}">Back to the home page</a>
+    </div>
+  </div>
+</section>
+{% endblock %}

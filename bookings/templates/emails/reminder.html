@@ -1,0 +1,8 @@
+{% extends "emails/_base.html" %}
+{% block body %}
+<p>Hi {{ customer.first_name }},</p>
+<p>See you {{ day_word }}.</p>
+{% include "emails/_details.html" %}
+<p>Please arrive 5 minutes early, with the area clean and free of creams or make-up.</p>
+{% include "emails/_button.html" %}
+{% endblock %}

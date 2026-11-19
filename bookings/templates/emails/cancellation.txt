@@ -1,0 +1,10 @@
+{% load booking_tags %}{% autoescape off %}
+Hi {{ customer.first_name }},
+
+Your booking has been cancelled:
+{{ start|date:"l j F" }} at {{ start|time:"H:i" }}, {{ service.name }}
+
+Book a new time: {{ site_url }}{% url 'bookings:book' %}?service={{ service.slug }}
+
+{{ business.name }}
+{% endautoescape %}

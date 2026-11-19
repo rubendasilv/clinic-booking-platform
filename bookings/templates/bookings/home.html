@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% load booking_tags %}
+{% block title %}{{ business.name }}: laser tattoo removal and hair removal in London{% endblock %}
+{% block content %}
+<section class="hero">
+  <div class="wrap">
+    <h1>Every session, the ink gets a little lighter.</h1>
+    <p class="lede">Laser tattoo removal and laser hair removal in London. Start with a free consultation and patch test, then book each session online.</p>
+    <div class="btn-row">
+      {% if consultation %}
+      <a class="btn" href="{% url 'bookings:book' %}?service={{ consultation.slug }}">Book a free consultation</a>
+      {% endif %}
+      <a class="btn btn-quiet" href="{% url 'bookings:services' %}">See prices</a>
+    </div>
+  </div>
+  <svg class="ink-line" viewBox="0 0 1200 140" preserveAspectRatio="none" role="img" aria-label="A line of tattoo ink that fades from dark to clear, left to right">
+    <defs>
+      <linearGradient id="fade" x1="0" x2="1">
+        <stop offset="0" stop-color="#14213d"/>
+        <stop offset="0.35" stop-color="#14213d" stop-opacity="0.75"/>
+        <stop offset="0.7" stop-color="#14213d" stop-opacity="0.25"/>
+        <stop offset="1" stop-color="#14213d" stop-opacity="0"/>
+      </linearGradient>
+    </defs>
+    <path d="M-10 92 C 120 20, 220 20, 300 70 S 470 130, 560 72 S 740 10, 840 64 S 1020 120, 1210 48"/>
+    <text x="40" y="132">First session</text>
+    <text x="1060" y="132">Last session</text>
+  </svg>
+</section>
+
+<section class="section">
+  <div class="wrap">
+    <h2>How it works</h2>
+    <ol class="steps">
+      <li>
+        <h3>Consultation and patch test</h3>
+        <p>We look at your tattoo or skin and hair type, explain how many sessions you might need, and test a small area. It's free and takes 30 minutes.</p>
+      </li>
+      <li>
+        <h3>Treatment sessions</h3>
+        <p>Sessions are spaced 6 to 8 weeks apart for tattoos and 4 to 6 weeks for hair removal, so your skin can recover. Book each one online.</p>
+      </li>
+      <li>
+        <h3>Aftercare</h3>
+        <p>Keep the area clean, moisturised and out of the sun. We'll email you aftercare instructions and a reminder the day before each visit.</p>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<section class="section">
+  <div class="wrap">
+    <h2>Prices</h2>
+    <p class="muted">Prices are per session. A deposit secures your appointment and comes off the final price.</p>
+    {% for group in groups %}
+      {% include "bookings/partials/price_table.html" %}
+    {% endfor %}
+  </div>
+</section>
+
+<section class="section">
+  <div class="wrap split">
+    <div>
+      <h2>Opening hours</h2>
+      <table class="hours">
+        <caption class="visually-hidden">Opening hours</caption>
+        {% for h in hours %}
+        <tr><th scope="row">{{ h.get_weekday_display }}</th><td>{% if h.is_closed %}Closed{% else %}{{ h.opens_at|time:"H:i" }}–{{ h.closes_at|time:"H:i" }}{% endif %}</td></tr>
+        {% endfor %}
+      </table>
+    </div>
+    <div>
+      <h2>Find us</h2>
+      <p>{{ business.address }}</p>
+      <p><a href="https://www.google.com/maps/search/?api=1&query={{ business.address|urlencode }}">Open in Google Maps</a></p>
+    </div>
+  </div>
+</section>
+
+<section class="section faq">
+  <div class="wrap">
+    <h2>Questions</h2>
+    <details>
+      <summary>How many sessions will I need?</summary>
+      <p>It depends on the size, age and colours of the tattoo, and your skin. Most tattoos take several sessions. We'll give you an estimate at your consultation.</p>
+    </details>
+    <details>
+      <summary>Does it hurt?</summary>
+      <p>Most people describe it as a sharp snapping feeling. Sessions are short, and we use cooling to keep you comfortable.</p>
+    </details>
+    <details>
+      <summary>Why do I need a patch test?</summary>
+      <p>It shows how your skin reacts to the laser before we treat a larger area. You need one before your first treatment, at least 48 hours before.</p>
+    </details>
+    <details>
+      <summary>Can I change or cancel my booking?</summary>
+      <p>Yes. Use the link in your confirmation email. Changes made less than {{ rules.cancellation_window_hours }} hours before your appointment lose the deposit.</p>
+    </details>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% load booking_tags %}
+{% block title %}Dashboard | {{ business.name }}{% endblock %}
+{% block head %}<meta name="robots" content="noindex">{% endblock %}
+{% block content %}
+<section class="section">
+  <div class="wrap">
+    <div class="btn-row" style="justify-content: space-between; margin-bottom: var(--space-3)">
+      <h1 style="margin: 0">Dashboard</h1>
+      <div class="btn-row">
+        <a class="btn btn-quiet" href="{% url 'bookings:export_bookings' %}">Download bookings CSV</a>
+        <a class="btn btn-quiet" href="{% url 'bookings:export_services' %}">Download prices CSV</a>
+        <a class="btn" href="{% url 'admin:bookings_booking_changelist' %}">Open admin</a>
+      </div>
+    </div>
+
+    <div class="kpis">
+      <div class="kpi"><div class="value">{{ upcoming_count }}</div><div class="label">Confirmed bookings, next 7 days</div></div>
+      <div class="kpi"><div class="value">{{ utilisation }}%</div><div class="label">Of opening hours booked, next 7 days</div></div>
+      <div class="kpi"><div class="value">{{ revenue_30|gbp }}</div><div class="label">Completed treatments, last 30 days</div></div>
+      <div class="kpi"><div class="value">{{ bookings_made_30 }}</div><div class="label">Bookings made, last 30 days</div></div>
+      <div class="kpi"><div class="value">{% if cancel_rate is None %}–{% else %}{{ cancel_rate }}%{% endif %}</div><div class="label">Cancelled, of bookings made in last 30 days</div></div>
+      <div class="kpi"><div class="value">{% if no_show_rate is None %}–{% else %}{{ no_show_rate }}%{% endif %}</div><div class="label">No-shows, last 30 days</div></div>
+    </div>
+
+    <div class="split">
+      <div>
+        <h2 style="font-size: var(--step-1)">Bookings by treatment, last 30 days</h2>
+        <ul class="bars">
+          {% for row in by_service %}
+          <li title="{{ row.label }}: {{ row.n }} booking{{ row.n|pluralize }}{% if row.value %}, {{ row.value|gbp }}{% endif %}">
+            <span>{{ row.label }}</span>
+            <span class="track"><span class="bar" style="display:block; width: {{ row.pct }}%"></span></span>
+            <span class="n">{{ row.n }}</span>
+          </li>
+          {% empty %}<li>No bookings yet.</li>{% endfor %}
+        </ul>
+      </div>
+      <div>
+        <h2 style="font-size: var(--step-1)">Bookings by where clients came from</h2>
+        <ul class="bars">
+          {% for row in by_source %}
+          <li title="{{ row.label }}: {{ row.n }} booking{{ row.n|pluralize }}">
+            <span>{{ row.label|capfirst }}</span>
+            <span class="track"><span class="bar" style="display:block; width: {{ row.pct }}%"></span></span>
+            <span class="n">{{ row.n }}</span>
+          </li>
+          {% empty %}<li>No bookings yet.</li>{% endfor %}
+        </ul>
+        <p class="small muted" style="margin-top: var(--space-2)">Add <code>?utm_source=tiktok&amp;utm_campaign=launch</code> to the links in your ads to see them here.</p>
+      </div>
+    </div>
+
+    <h2 style="font-size: var(--step-1); margin-top: var(--space-4)">Next appointments</h2>
+    <table class="data-table">
+      <thead><tr><th>When</th><th>Client</th><th>Treatment</th><th>Status</th><th>Deposit</th></tr></thead>
+      <tbody>
+        {% for b in next_bookings %}
+        <tr>
+          <td><a href="{% url 'admin:bookings_booking_change' b.pk %}">{{ b.start|date:"D j M, H:i" }}</a></td>
+          <td>{{ b.customer.full_name }}</td>
+          <td>{{ b.service.name }}</td>
+          <td>{{ b.get_status_display }}</td>
+          <td>{% if b.deposit %}{% if b.deposit_paid %}Paid{% else %}Due{% endif %}{% else %}–{% endif %}</td>
+        </tr>
+        {% empty %}<tr><td colspan="5">No upcoming appointments.</td></tr>{% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}

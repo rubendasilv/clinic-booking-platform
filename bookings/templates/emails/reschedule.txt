@@ -1,0 +1,12 @@
+{% load booking_tags %}{% autoescape off %}
+Hi {{ customer.first_name }},
+
+Your booking has moved. The new time is:
+{{ start|date:"l j F" }} at {{ start|time:"H:i" }}
+{{ service.name }}
+{{ business.address }}
+
+Change or cancel: {{ manage_url }}
+
+{{ business.name }}
+{% endautoescape %}

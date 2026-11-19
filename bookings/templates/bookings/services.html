@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Treatments and prices | {{ business.name }}{% endblock %}
+{% block content %}
+<section class="section">
+  <div class="wrap">
+    <h1>Treatments and prices</h1>
+    <p class="lede">All prices are per session. Your first visit is a free consultation and patch test.</p>
+    <div class="notice">
+      <p>A deposit secures each appointment and comes off the price on the day. It's refunded if you cancel at least {{ rules.cancellation_window_hours }} hours before.</p>
+    </div>
+    {% for group in groups %}
+      {% include "bookings/partials/price_table.html" %}
+    {% empty %}
+      <p>Treatments will be listed here soon. Call us on {{ business.phone }} to book.</p>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

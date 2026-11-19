@@ -1,0 +1,17 @@
+{% load booking_tags %}{% autoescape off %}
+{{ event }}
+
+When:      {{ start|date:"l j F Y" }} at {{ start|time:"H:i" }}
+Treatment: {{ service.name }}
+Client:    {{ customer.full_name }}
+Email:     {{ customer.email }}
+Phone:     {{ customer.phone }}
+Status:    {{ booking.get_status_display }}
+Deposit:   {% if booking.deposit %}{{ booking.deposit|gbp }} ({% if booking.deposit_paid %}paid{% else %}not paid{% endif %}){% else %}none{% endif %}
+Source:    {{ booking.utm_source|default:"direct" }}
+{% if booking.notes %}
+Notes:
+{{ booking.notes }}
+{% endif %}
+Open in admin: {{ site_url }}/admin/bookings/booking/{{ booking.pk }}/change/
+{% endautoescape %}

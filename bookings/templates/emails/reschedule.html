@@ -1,0 +1,7 @@
+{% extends "emails/_base.html" %}
+{% block body %}
+<p>Hi {{ customer.first_name }},</p>
+<p>Your booking has moved. Here's the new time, and an updated calendar invite is attached.</p>
+{% include "emails/_details.html" %}
+{% include "emails/_button.html" %}
+{% endblock %}

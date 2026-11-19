@@ -1,0 +1,20 @@
+{% load booking_tags %}
+<div class="price-group" id="{{ group.key }}">
+  <h3>{{ group.label }}</h3>
+  <table class="price-table">
+    <thead>
+      <tr><th scope="col">Treatment</th><th scope="col" class="num">Time</th><th scope="col" class="num">Deposit</th><th scope="col" class="num">Price</th><th scope="col"><span class="visually-hidden">Book</span></th></tr>
+    </thead>
+    <tbody>
+      {% for s in group.services %}
+      <tr>
+        <th scope="row">{{ s.name }}<span>{{ s.summary }}</span></th>
+        <td class="num" data-label="Time">{{ s.duration_minutes|minutes }}</td>
+        <td class="num" data-label="Deposit">{% if s.deposit %}{{ s.deposit|gbp }}{% else %}None{% endif %}</td>
+        <td class="num price">{% if s.price %}{% if s.price_is_from %}from {% endif %}{{ s.price|gbp }}{% else %}Free{% endif %}</td>
+        <td><a href="{% url 'bookings:book' %}?service={{ s.slug }}">Book<span class="visually-hidden"> {{ s.name }}</span></a></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>

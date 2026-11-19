@@ -1,0 +1,20 @@
+<p class="muted small" id="days-label">Days with free times for {{ service.name|lower }}:</p>
+<div class="days" role="group" aria-labelledby="days-label">
+  {% for day, count, is_open in days %}
+  <button type="button" class="day" aria-pressed="false"
+          {% if not count %}disabled{% endif %}
+          hx-get="{% url 'bookings:slots' %}?service={{ service.pk }}&date={{ day|date:'Y-m-d' }}{% if token %}&token={{ token }}{% endif %}"
+          hx-target="#slot-picker" hx-indicator="#slots-loading"
+          aria-label="{{ day|date:'l j F' }}, {% if count %}{{ count }} time{{ count|pluralize }} free{% elif is_open %}fully booked{% else %}closed{% endif %}">
+    <span>{{ day|date:"D" }}</span>
+    <b>{{ day|date:"j" }}</b>
+    <small>{% if count %}{{ day|date:"M" }}{% elif is_open %}Full{% else %}Closed{% endif %}</small>
+  </button>
+  {% empty %}
+  <p>No days are open for booking right now. Call {{ business.phone }}.</p>
+  {% endfor %}
+</div>
+<p class="loading-hint" id="slots-loading">Loading times…</p>
+<div id="slot-picker" aria-live="polite">
+  <p class="muted">Pick a day to see times.</p>
+</div>

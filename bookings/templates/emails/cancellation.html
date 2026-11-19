@@ -1,0 +1,7 @@
+{% extends "emails/_base.html" %}
+{% block body %}
+<p>Hi {{ customer.first_name }},</p>
+<p>Your booking has been cancelled.</p>
+{% include "emails/_details.html" %}
+<p><a href="{{ site_url }}{% url 'bookings:book' %}?service={{ service.slug }}" style="color:#075c58;">Book a new time</a></p>
+{% endblock %}

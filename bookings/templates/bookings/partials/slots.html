@@ -1,0 +1,15 @@
+<h3 style="font-size: var(--step-0); margin-top: var(--space-2)">{{ day|date:"l j F" }}</h3>
+{% if slots %}
+<div class="slots" role="radiogroup" aria-label="Times on {{ day|date:'l j F' }}">
+  {% for slot in slots %}
+  <label class="slot">
+    <input type="radio" name="start" value="{{ slot.isoformat }}" required
+           data-label="{{ slot|date:'D j M' }}, {{ slot|time:'H:i' }}"
+           {% if selected == slot.isoformat %}checked{% endif %}>
+    <span>{{ slot|time:"H:i" }}</span>
+  </label>
+  {% endfor %}
+</div>
+{% else %}
+<p class="slots-empty">No free times on this day. Try another day.</p>
+{% endif %}

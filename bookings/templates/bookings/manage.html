@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% load static booking_tags %}
+{% block title %}Your booking | {{ business.name }}{% endblock %}
+{% block head %}<meta name="robots" content="noindex">{% endblock %}
+{% block content %}
+<section class="section">
+  <div class="wrap">
+    <h1>Your booking</h1>
+    {% if messages %}
+    <ul class="messages">
+      {% for m in messages %}<li class="notice {% if m.tags == 'error' %}notice-error{% endif %}">{{ m }}</li>{% endfor %}
+    </ul>
+    {% endif %}
+
+    <div class="ticket">
+      <p class="when">{{ start|date:"l j F" }} at {{ start|time:"H:i" }}</p>
+      <p>{{ booking.service.name }}, {{ booking.service.duration_minutes|minutes }}<br>Booked for {{ booking.customer.full_name }}</p>
+      <p><span class="status status-{{ booking.status }}">{{ booking.get_status_display }}</span></p>
+    </div>
+
+    {% if booking.status == "pending_payment" %}
+    <form method="post">{% csrf_token %}<input type="hidden" name="action" value="pay">
+      <button class="btn" type="submit">Pay {{ booking.deposit|gbp }} deposit</button>
+    </form>
+    {% endif %}
+
+    {% if booking.is_upcoming %}
+      {% if late and booking.deposit %}
+      <div class="notice notice-warn"><p>Your appointment is less than {{ rules.cancellation_window_hours }} hours away, so the {{ booking.deposit|gbp }} deposit can't be refunded if you move or cancel it.</p></div>
+      {% endif %}
+
+      <h2 style="margin-top: var(--space-4)">Move to another time</h2>
+      <form method="post" id="reschedule-form">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="reschedule">
+        {% with service=booking.service %}{% include "bookings/partials/days.html" %}{% endwith %}
+        <p style="margin-top: var(--space-3)"><button class="btn" type="submit">Move my booking</button></p>
+      </form>
+
+      <h2 style="margin-top: var(--space-4)">Cancel</h2>
+      <form method="post" onsubmit="return confirm('Cancel this booking?');">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="cancel">
+        <button class="btn btn-danger" type="submit">Cancel booking</button>
+      </form>
+    {% else %}
+      <p>This booking can't be changed online. Call us on {{ business.phone }} if you need help.</p>
+      <p><a class="btn" href="{% url 'bookings:book' %}?service={{ booking.service.slug }}">Make a new booking</a></p>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}
+{% block scripts %}<script src="{% static 'bookings/js/booking.js' %}" defer></script>{% endblock %}

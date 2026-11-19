@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% load static booking_tags %}
+{% block title %}Book an appointment | {{ business.name }}{% endblock %}
+{% block content %}
+<section class="section">
+  <div class="wrap">
+    <h1>Book an appointment</h1>
+    <p class="lede">Choose a treatment, pick a time, and you'll get a confirmation email with a calendar invite.</p>
+    <noscript><div class="notice notice-warn"><p>Turn on JavaScript to see available times, or call {{ business.phone }} to book.</p></div></noscript>
+
+    {% if form.non_field_errors %}<div class="notice notice-error">{{ form.non_field_errors }}</div>{% endif %}
+
+    <form method="post" id="booking-form" class="book-layout" novalidate>
+      {% csrf_token %}
+      <div>
+        <fieldset class="step">
+          <legend><span class="n" aria-hidden="true">1</span> Treatment</legend>
+          {{ form.service.errors }}
+          {% for group in groups %}
+            <p class="choice-group-label" id="grp-{{ group.key }}">{{ group.label }}</p>
+            <div class="choice-list" role="group" aria-labelledby="grp-{{ group.key }}">
+              {% for s in group.services %}
+              <label class="choice">
+                <input type="radio" name="service" value="{{ s.pk }}"
+                       {% if service and service.pk == s.pk %}checked{% endif %}
+                       hx-get="{% url 'bookings:days' %}" hx-target="#day-picker" hx-trigger="change"
+                       hx-indicator="#days-loading"
+                       data-name="{{ s.name }}"
+                       data-price="{% if s.price %}{% if s.price_is_from %}from {% endif %}{{ s.price|gbp }}{% else %}Free{% endif %}"
+                       data-deposit="{% if s.deposit %}{{ s.deposit|gbp }}{% else %}None{% endif %}"
+                       data-duration="{{ s.duration_minutes|minutes }}"
+                       data-patch="{{ s.requires_patch_test|yesno:'1,0' }}">
+                <span class="title">{{ s.name }}</span>
+                <span class="amount">{% if s.price %}{% if s.price_is_from %}from {% endif %}{{ s.price|gbp }}{% else %}Free{% endif %}</span>
+                <span class="meta">{{ s.duration_minutes|minutes }}{% if s.deposit %}, {{ s.deposit|gbp }} deposit{% endif %}</span>
+              </label>
+              {% endfor %}
+            </div>
+          {% endfor %}
+          <div class="notice notice-warn" id="patch-note" {% if not service or not service.requires_patch_test %}hidden{% endif %} style="margin-top: var(--space-2)">
+            <p>You need a patch test at least 48 hours before your first treatment. If you haven't had one, book a consultation first.</p>
+          </div>
+        </fieldset>
+
+        <fieldset class="step">
+          <legend><span class="n" aria-hidden="true">2</span> Day and time</legend>
+          <p class="loading-hint" id="days-loading">Loading available days…</p>
+          <div id="day-picker">
+            {% if service %}
+              {% include "bookings/partials/days.html" %}
+            {% else %}
+              <p class="muted">Choose a treatment to see available times.</p>
+            {% endif %}
+          </div>
+          {{ form.start.errors }}
+        </fieldset>
+
+        <fieldset class="step">
+          <legend><span class="n" aria-hidden="true">3</span> Your details</legend>
+          <div class="field-row">
+            {% include "bookings/partials/field.html" with field=form.first_name %}
+            {% include "bookings/partials/field.html" with field=form.last_name %}
+          </div>
+          {% include "bookings/partials/field.html" with field=form.email %}
+          {% include "bookings/partials/field.html" with field=form.phone %}
+          {% include "bookings/partials/field.html" with field=form.notes %}
+          {% for f in form %}{% if f.name == "is_adult" or f.name == "accepts_policy" or f.name == "marketing_opt_in" %}
+          <div class="check">
+            {{ f }}
+            <div>
+              <label for="{{ f.id_for_label }}">{% if f.name == "accepts_policy" %}I have read the <a href="{% url 'bookings:policies' %}" target="_blank">booking and cancellation policy</a>{% else %}{{ f.label }}{% endif %}</label>
+              {{ f.errors }}
+            </div>
+          </div>
+          {% endif %}{% endfor %}
+        </fieldset>
+      </div>
+
+      <aside class="summary" aria-labelledby="summary-title">
+        <h2 id="summary-title">Your booking</h2>
+        <dl>
+          <dt>Treatment</dt><dd id="sum-service">{% if service %}{{ service.name }}{% else %}Not chosen{% endif %}</dd>
+          <dt>Time</dt><dd id="sum-time">Not chosen</dd>
+          <dt>Length</dt><dd id="sum-duration">{% if service %}{{ service.duration_minutes|minutes }}{% else %}–{% endif %}</dd>
+          <dt>Price</dt><dd id="sum-price">{% if service %}{% if service.price %}{{ service.price|gbp }}{% else %}Free{% endif %}{% else %}–{% endif %}</dd>
+          <dt>Deposit</dt><dd id="sum-deposit">{% if service and service.deposit %}{{ service.deposit|gbp }}{% else %}–{% endif %}</dd>
+        </dl>
+        <button type="submit" class="btn">Confirm booking</button>
+        <p class="small muted" style="margin-top: var(--space-2)">You can change or cancel using the link in your confirmation email.</p>
+      </aside>
+    </form>
+  </div>
+</section>
+{% endblock %}
+{% block scripts %}<script src="{% static 'bookings/js/booking.js' %}" defer></script>{% endblock %}

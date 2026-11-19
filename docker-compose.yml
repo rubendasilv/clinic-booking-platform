@@ -1,0 +1,65 @@
+# Local development: `docker compose up --build`
+#   Website  http://localhost:8000
+#   Admin    http://localhost:8000/admin   (admin / clearline-demo)
+#   Emails   http://localhost:8025         (Mailpit catches every email)
+
+x-app: &app
+  build:
+    context: .
+    args:
+      REQUIREMENTS: requirements-dev.txt
+  image: clinic-booking-platform:dev
+  env_file: .env
+  volumes:
+    - .:/app
+  depends_on:
+    db:
+      condition: service_healthy
+    redis:
+      condition: service_healthy
+
+services:
+  web:
+    <<: *app
+    command: python manage.py runserver 0.0.0.0:8000
+    environment:
+      RUN_MIGRATIONS: "1"
+      # load demo treatments, an admin login and fake bookings (set SEED_DEMO=0 in .env to stop)
+      SEED_DEMO: ${SEED_DEMO:-1}
+    ports:
+      - "8000:8000"
+
+  worker:
+    <<: *app
+    command: celery -A config worker --loglevel=info
+
+  beat:
+    <<: *app
+    command: celery -A config beat --loglevel=info --schedule /tmp/celerybeat-schedule
+
+  db:
+    image: postgres:16-alpine
+    env_file: .env
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  mailpit:
+    image: axllent/mailpit:latest
+    ports:
+      - "8025:8025"
+
+volumes:
+  pgdata:

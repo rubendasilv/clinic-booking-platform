@@ -1,0 +1,12 @@
+{% extends "emails/_base.html" %}
+{% load booking_tags %}
+{% block body %}
+<p>Hi {{ customer.first_name }},</p>
+<p>Your booking is confirmed. The calendar invite is attached.</p>
+{% include "emails/_details.html" %}
+{% if booking.deposit %}<p>{% if booking.deposit_paid %}Your {{ booking.deposit|gbp }} deposit is paid and comes off the price on the day.{% else %}A {{ booking.deposit|gbp }} deposit is payable at your appointment.{% endif %}</p>{% endif %}
+{% if service.requires_patch_test %}<p><strong>First treatment?</strong> You need a patch test at least 48 hours before. Reply to this email if you haven't had one.</p>{% endif %}
+<p><strong>Before you come:</strong> avoid sun and fake tan on the area for 2 weeks, and shave (don't wax) the area the day before hair removal.</p>
+{% include "emails/_button.html" %}
+<p style="font-size:14px;color:#536a89;">Changes made less than {{ rules.cancellation_window_hours }} hours before your appointment lose the deposit.</p>
+{% endblock %}

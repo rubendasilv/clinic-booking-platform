@@ -1,0 +1,55 @@
+{% load static %}<!doctype html>
+<html lang="en-GB">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}{{ business.name }}{% endblock %}</title>
+  <meta name="description" content="{% block description %}{{ business.tagline }}. See prices and book online.{% endblock %}">
+  <meta property="og:title" content="{% block og_title %}{{ business.name }}{% endblock %}">
+  <meta property="og:description" content="{{ business.tagline }}. See prices and book online.">
+  <meta name="theme-color" content="#14213d">
+  <link rel="icon" href="{% static 'bookings/favicon.svg' %}" type="image/svg+xml">
+  <link rel="preload" href="{% static 'bookings/fonts/bricolage-grotesque-latin-700-normal.woff2' %}" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="{% static 'bookings/css/site.css' %}">
+  <script src="{% static 'bookings/js/htmx.min.js' %}" defer></script>
+  {% block head %}{% endblock %}
+</head>
+<body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="site-header">
+    <div class="wrap">
+      <a class="wordmark" href="{% url 'bookings:home' %}">
+        <svg viewBox="0 0 40 16" aria-hidden="true"><defs><linearGradient id="wm" x1="0" x2="1"><stop offset="0" stop-color="#14213d"/><stop offset="1" stop-color="#14213d" stop-opacity="0"/></linearGradient></defs><path d="M2 11 C 10 2, 16 2, 20 8 S 32 14, 38 5" fill="none" stroke="url(#wm)" stroke-width="3.2" stroke-linecap="round"/></svg>
+        {{ business.name }}
+      </a>
+      {% with p=request.resolver_match.url_name %}
+      <nav class="nav" aria-label="Main">
+        <a href="{% url 'bookings:services' %}" {% if p == 'services' %}aria-current="page"{% endif %}>Treatments and prices</a>
+        <a href="{% url 'bookings:products' %}" {% if p == 'products' %}aria-current="page"{% endif %}>Shop</a>
+        <a class="nav-extra" href="{% url 'bookings:policies' %}" {% if p == 'policies' %}aria-current="page"{% endif %}>Booking policy</a>
+        <a class="btn" href="{% url 'bookings:book' %}">Book now</a>
+      </nav>
+      {% endwith %}
+    </div>
+  </header>
+
+  <main id="main">
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap split">
+      <div>
+        <p><strong>{{ business.name }}</strong><br>{{ business.address }}</p>
+        <p><a href="tel:{{ business.phone|cut:' ' }}">{{ business.phone }}</a><br><a href="mailto:{{ business.email }}">{{ business.email }}</a></p>
+      </div>
+      <div>
+        <p>Follow before-and-after progress on <a href="{{ business.instagram }}">Instagram</a> and <a href="{{ business.tiktok }}">TikTok</a>.</p>
+        <p class="small">Treatments are for over-18s only. Results vary from person to person and are discussed at your consultation.</p>
+        <p class="small"><a href="{% url 'bookings:policies' %}">Booking, cancellation and privacy policy</a></p>
+      </div>
+    </div>
+  </footer>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

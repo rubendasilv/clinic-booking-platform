@@ -1,0 +1,15 @@
+{% load booking_tags %}{% autoescape off %}
+Hi {{ customer.first_name }},
+
+See you {{ day_word }}.
+
+{{ start|date:"l j F" }} at {{ start|time:"H:i" }}
+{{ service.name }}
+{{ business.address }}
+
+Please arrive 5 minutes early, with the area clean and free of creams or make-up.
+
+Change or cancel: {{ manage_url }}
+
+{{ business.name }}
+{% endautoescape %}

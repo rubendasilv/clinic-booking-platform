@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Booking policy | {{ business.name }}{% endblock %}
+{% block content %}
+<section class="section">
+  <div class="wrap">
+    <h1>Booking, cancellation and privacy policy</h1>
+    <div class="notice notice-warn"><p>Template text for the prototype. Have the final wording checked before launch.</p></div>
+
+    <h2>Booking</h2>
+    <p>You must be 18 or over to book a laser treatment. You need a consultation and patch test before your first treatment, at least 48 hours before.</p>
+    <p>Bookings open {{ rules.min_notice_hours }} hours ahead and up to {{ rules.max_days_ahead }} days in advance.</p>
+
+    <h2>Deposits</h2>
+    <p>Most treatments need a deposit to secure the time. It comes off the price of the session. If you pay online, the time is held for {{ rules.unpaid_hold_minutes }} minutes while you pay.</p>
+
+    <h2>Changing or cancelling</h2>
+    <p>Use the link in your confirmation email to move or cancel your appointment. If you cancel or move it less than {{ rules.cancellation_window_hours }} hours before the start time, or don't attend, the deposit is kept.</p>
+
+    <h2>Your information</h2>
+    <p>We use your name, email and phone number to manage your bookings and send reminders. We only send offers if you ask us to. We keep booking records for as long as we need them for treatment and legal reasons. Email {{ business.email }} to see, correct or delete your information.</p>
+  </div>
+</section>
+{% endblock %}
