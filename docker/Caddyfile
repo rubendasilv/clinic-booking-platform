@@ -19,3 +19,8 @@
 		-Server
 	}
 }
+
+# send www.yourdomain to yourdomain so both addresses work
+www.{$DOMAIN} {
+	redir https://{$DOMAIN}{uri} permanent
+}
